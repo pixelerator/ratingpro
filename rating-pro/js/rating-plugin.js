@@ -7,3 +7,4 @@ $('#star').raty({
 });
 //alert(document.getElementById('star').innerHTML);
 //alert($('#star'));
+$('#submit-comment-rating').raty({ scoreName: 'rater_rating',path : 'wp-content/plugins/rating-pro/lib/img/'});

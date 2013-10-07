@@ -16,24 +16,19 @@ function rating_plugin_scripts() {
 	wp_enqueue_script('rating_plugin_scripts', plugin_dir_url(__FILE__) . 'lib/jquery.raty.js', FALSE, FALSE, TRUE);
 	//wp_register_script('rating_plugin_custom', plugin_dir_url(__FILE__) . 'js/rating-plugin.js');
 	wp_enqueue_script('rating_plugin_custom', plugin_dir_url(__FILE__) . 'js/rating-plugin.js', FALSE, FALSE, TRUE);
-	if(is_admin){
-	wp_enqueue_script('rating_plugin_bootstrap', plugin_dir_url(__FILE__) . 'js/bootstrap.min.js', FALSE, FALSE, TRUE);
-	 wp_register_style( 'rater-boot-style', plugin_dir_url(__FILE__) . 'css/bootstrap.min.css' );
-     wp_enqueue_style( 'rater-boot-style' );
-	 wp_register_style( 'rater-boot-style-responsive', plugin_dir_url(__FILE__) . 'css/bootstrap-responsive.min.css' );
-     wp_enqueue_style( 'rater-boot-style-responsive'); 
-	}
+	
 }
+
 function rating_admin_plugin_scripts() {
 
-
 	wp_enqueue_script('rating_plugin_bootstrap', plugin_dir_url(__FILE__) . 'js/bootstrap.min.js', FALSE, FALSE, TRUE);
-	 wp_register_style( 'rater-boot-style', plugin_dir_url(__FILE__) . 'css/bootstrap.min.css' );
-     wp_enqueue_style( 'rater-boot-style' );
-	 wp_register_style( 'rater-boot-style-responsive', plugin_dir_url(__FILE__) . 'css/bootstrap-responsive.min.css' );
-     wp_enqueue_style( 'rater-boot-style-responsive'); 
+	wp_register_style('rater-boot-style', plugin_dir_url(__FILE__) . 'css/bootstrap.min.css');
+	wp_enqueue_style('rater-boot-style');
+	wp_register_style('rater-boot-style-responsive', plugin_dir_url(__FILE__) . 'css/bootstrap-responsive.min.css');
+	wp_enqueue_style('rater-boot-style-responsive');
 
 }
+
 add_action('wp_enqueue_scripts', 'rating_plugin_scripts');
 add_action('admin_enqueue_scripts', 'rating_admin_plugin_scripts');
 
@@ -53,49 +48,63 @@ function rating_plugin_options() {
 function rate_post_content($content) {
 
 	if (is_single()) {
+
 		global $post;
-		$current_cat = get_the_category($post -> ID); 
+		$current_cat = get_the_category($post -> ID);
 		$selected_cat_from_admin = get_option("rater");
-		$do = 0;
-		foreach ($selected_cat_from_admin as $skey => $svalue) {
-			foreach ($current_cat as $ckey => $cvalue) {
-				if($cvalue->cat_ID==$svalue){
-					$do = 1;
+		if (is_array($selected_cat_from_admin)) {
+			$do = 0;
+			foreach ($selected_cat_from_admin as $skey => $svalue) {
+				foreach ($current_cat as $ckey => $cvalue) {
+					if ($cvalue -> cat_ID == $svalue) {
+						$do = 1;
+					}
 				}
 			}
+			if ($do == 1) {
+				$rating_value = get_post_meta($post -> ID, "rater_rate", FALSE);
+				if (empty($rating_value)) {
+					add_post_meta($post -> ID, "rater_rate", 0);
+				}
+				$rating_value = get_post_meta($post -> ID, "rater_rate", TRUE);
+				return $content . "<div style='border:1px solid red;clear:both;'><div id='star' data-score='" . $rating_value . "'></div></div>";
+			}
+		}else{
+			return $content;
 		}
-		if($do==1){
-		$rating_value = get_post_meta($post -> ID, "rater_rate", FALSE);
-		if (empty($rating_value)) {
-			add_post_meta($post -> ID, "rater_rate", 0);
-		}
-		$rating_value = get_post_meta($post -> ID, "rater_rate", TRUE);
-		return $content . "<div style='border:1px solid red;clear:both;'><div id='star' data-score='" . $rating_value . "'></div></div>";
-	}
 	}
 	return $content;
 }
 
 add_filter('the_content', 'rate_post_content');
 //Adding new option in the fields
-add_filter('comment_form_default_fields', 'my_comment_form_default_fields');
+//add_filter('comment_form_default_fields', 'my_comment_form_default_fields');
+add_action('comment_form_logged_in_after', 'my_comment_form_default_fields_logged');
+add_action('comment_form_after_fields', 'my_comment_form_default_fields_logged');
+function my_comment_form_default_fields_logged($fields) {
+
+	echo '<p class="comment-form-rating">'.
+	'<label for="rating">'. __('Rating') . '<span class="required">*</span></label><div id="submit-comment-rating"></div><span class="comment-rating-box"></span></p>';
+
+	//return $fields;
+}
 
 function my_comment_form_default_fields($fields) {
 
-	$fields['twitter'] = '<p class="comment-form-rating"><label for="rating">' . __('Rating ') . '</label><input type="text" id="rater_rating" name="rater_twitter" value="" size="30" /></p>';
+	$fields['rating-at'] = '<p class="comment-form-rating"><label for="rating">' . __('Rating ') . '</label><input type="text" id="rater_rating" name="rater_twitter" value="" size="30" /></p>';
 
 	return $fields;
 }
 
 //end of adding new fields
-add_filter('comment_form_field_comment', 'my_comment_form_field_comment');
+/*add_filter('comment_form_field_comment', 'my_comment_form_field_comment');
 
 function my_comment_form_field_comment($comment_field) {
 
 	$comment_field = '<div style="border 1px solid green;" class="myclass">fkjsdhfjkhsdkjfhj' . $comment_field . '</div>';
 
 	return $comment_field;
-}
+}*/
 
 // function additional_fields ($below) {
 // global $comment;

@@ -1,4 +1,38 @@
-<div class="wrap">
-<h2>Rater Plugin</h2>
-<h3>Rater Plugin Options</h3>
-</div> 
+<?php
+if (isset($_POST['opot'])) {
+	$a = $_POST['cat'];
+	update_option("rater", $a);
+	echo '<div class="alert alert-success">Settting has been updated"</div>'; 
+}
+?>
+<?php
+
+$selected_cat = get_option("rater");
+$categories = get_categories();
+?>
+
+<div class="container">
+	<form method="post">
+		<fieldset>
+			<legend>
+				Rating PRO
+			</legend>
+			<label>Visibility of rating plugin</label>
+			<?php
+			foreach ($categories as $category) {
+				if ($category -> category_parent == 0) {
+					if (in_array($category -> cat_ID, $selected_cat)) {
+						echo '<label class="checkbox"><input type="checkbox" name="cat[]" checked="checked" value=' . $category -> cat_ID . '>' . $category -> cat_name . '</label>';
+					} else {
+						echo '<label class="checkbox"><input type="checkbox" name="cat[]" value=' . $category -> cat_ID . '>' . $category -> cat_name . '</label>';
+					}
+				}
+			}
+			?>
+			<button type="submit" class="btn" value="submit" name="opot">
+				Submit
+			</button>
+		</fieldset>
+	</form>
+</div>
+

@@ -13,9 +13,9 @@ $categories = get_categories();
 
 <div class="container">
 	<div class="row">
-		    <div class="progress">
-    <div class="bar" style="width: 100%;"></div>
-    </div>
+		<div class="progress">
+			<div class="bar" style="width: 100%;"></div>
+		</div>
 	</div>
 	<div class="row">
 		<div class="span3">
@@ -42,13 +42,6 @@ $categories = get_categories();
 						Submit
 					</button>
 				</fieldset>
-		</div>
-		<div class="span2">
-			<fieldset>
-				<label>Rich Snippets</label>
-				<label class="radio"><input type="radio" name="rich" value="1">Enable</label>
-				<label class="radio"><input type="radio" name="rich" value="0">Disable</label>
-			</fieldset>
 		</div>
 	</div>
 </div>
